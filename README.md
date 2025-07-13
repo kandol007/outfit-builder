@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧥 WYSIWYG Outfit Builder - Next.js
 
-## Getting Started
+A web-based **WYSIWYG outfit builder** built with **Next.js 13+ (App Router)**. Users can visually drag and drop clothing items onto a canvas, automatically layer them by category (e.g., top, bottom, cap), save the outfit locally, export it as a PNG image, or add it to a cart.
 
-First, run the development server:
+---
 
-```bash
+## 🚀 Features
+
+- 🧲 **Drag and drop** clothing items onto a visual canvas
+- 🧥 **Auto-layered stacking** by category (e.g., only one top at a time)
+- 💾 **Save outfits** to local storage
+- 🔁 **Reset outfit** button
+- 🛒 **Add to cart** functionality (Zustand state)
+- ✨ **Built with** Next.js 13+, Tailwind CSS, Zustand, html2canvas, Sonner
+
+---
+
+## 📦 Installation
+Install dependencies
+npm install
+
+
+Run locally
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Open the app
+Go to http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+📁 Folder Structure
+bash
+Copy
+Edit
+/public/clothing-icons/       # Clothing assets grouped into folders (e.g., accessories, tops, bottoms)
+/src/app/page.tsx             # Main outfit builder page
+/lib/store.ts                 # Zustand store (cart management)
+/lib/utils.ts                 # Utility functions
+/components/ui/button.tsx    # Custom Button component
+/tailwind.config.js           # Tailwind config (if manually added)
+/postcss.config.js            # PostCSS config
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+🛠️ Tech Stack
+Next.js 13+ (App Router)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Tailwind CSS for styling
 
-## Deploy on Vercel
+Zustand for state management
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Sonner for toast messages
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+html2canvas for exporting canvas as PNG
+
+
+💡 Notes
+Clothing assets should be placed in /public/clothing-icons/ inside respective folders like accessories/, tops/, bottoms/, etc.
+
+PNG images with transparent backgrounds work best for clean stacking.
+
+Only one item per category (top, bottom, shoe, cap, etc.) is shown on canvas at a time.
+
+Export as PNG is handled using html2canvas.
+
+
+📤 Deployment
+This app is fully compatible with Vercel and can be deployed directly using vercel CLI or GitHub integration.
+
+
+👨‍💻 Author
+Ritik Kumar
+
+📄 License
+Licensed under the MIT License.
