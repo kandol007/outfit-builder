@@ -4,6 +4,7 @@ import { useCartStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function CartPage() {
   const cart = useCartStore((s) => s.cart);
@@ -47,8 +48,14 @@ export default function CartPage() {
               className="flex items-center justify-between border p-4 rounded-lg bg-white shadow-sm"
             >
               <div className="flex items-center gap-4">
-                <img src={item.src} alt={item.name} className="w-16 h-16 object-contain" />
-                <div>
+                <Image
+                  src={item.src}
+                  alt={item.name}
+                  width={40}
+                  height={70}
+                  className="object-contain"
+                />  
+                <div className="w-16 h-16 object-contain">
                   <h3 className="text-lg font-semibold">{item.name}</h3>
                   <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                 </div>

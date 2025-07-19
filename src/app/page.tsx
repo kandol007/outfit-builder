@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'; // Import necessary hooks and compo
 import { useCartStore } from '@/lib/store'; // Import Zustand store
 import { Button } from '@/components/ui/button'; // Import Button component
 import { toast } from 'sonner'; // Import Sonner for notifications
-import { v4 as uuidv4 } from 'uuid'; // Import UUID for unique IDs
 import { Rnd } from 'react-rnd'; // Import Rnd for draggable and resizable components
 
 const clothingItems = [
@@ -31,16 +30,6 @@ const clothingItems = [
   { src: '/clothing-icons/tops/top4.png', name: 'Top 4' },
   { src: '/clothing-icons/tops/top5.png', name: 'Top 5' },
 ];  // Define clothing items with their image sources and names
-
-type CanvasItem = {    // Define the type for items on the canvas
-  id: string;
-  src: string;
-  name: string;
-  width: number;
-  height: number;
-  x: number;
-  y: number;
-};
 
 export default function OutfitBuilder() {  // Main component for the outfit builder
   const [canvasItems, setCanvasItems] = useState<typeof clothingItems>([]); 
