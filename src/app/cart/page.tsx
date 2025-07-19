@@ -1,59 +1,66 @@
 'use client';
 
-import Link from 'next/link';
 import { useCartStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import Link from 'next/link';
 
 export default function CartPage() {
   const cart = useCartStore((s) => s.cart);
-  const removeItem = useCartStore((s) => s.removeItem);
+  const increaseQuantity = useCartStore((s) => s.increaseQuantity);
+  const decreaseQuantity = useCartStore((s) => s.decreaseQuantity);
+  const removeItem = useCartStore((s) => s.removeItemById); // New method
+
+  const handleRemoveItem = (id: string) => {
+    removeItem(id);
+    toast.error('🧺 Item removed from cart.');
+  };
+
+  const handleIncrease = (id: string) => {
+    increaseQuantity(id);
+    toast.success('🔼 Increased quantity.');
+  };
+
+  const handleDecrease = (id: string) => {
+    decreaseQuantity(id);
+    toast.info('🔽 Decreased quantity.');
+  };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">🛒 Your Outfit Cart</h1>
+        <h1 className="text-3xl font-bold">🛒 Your Cart</h1>
         <Link href="/">
-          <Button variant="outline">🏠 Home</Button>
+          <Button variant="outline" className="text-xl font-semibold bg-gray-200">
+            🏠 Home
+          </Button>
         </Link>
       </div>
 
       {cart.length === 0 ? (
-        <p className="text-gray-600">Your cart is empty. Go back and add some outfits!</p>
+        <p className="text-gray-600 text-center">Your cart is empty. Add some items!</p>
       ) : (
-        <div className="space-y-6">
-          {cart.map((entry, idx) => (
+        <div className="space-y-4">
+          {cart.map((item) => (
             <div
-              key={idx}
-              className="p-4 border rounded-lg shadow-md bg-white"
+              key={item.id}
+              className="flex items-center justify-between border p-4 rounded-lg bg-white shadow-sm"
             >
-              <div className="flex justify-between items-center mb-2">
-                <h2 className="text-xl font-semibold">Outfit #{idx + 1}</h2>
-                <Button
-                  variant="destructive"
-                  onClick={() => removeItem(idx)}
-                  className="text-sm"
-                >
-                  Remove Outfit
-                </Button>
+              <div className="flex items-center gap-4">
+                <img src={item.src} alt={item.name} className="w-16 h-16 object-contain" />
+                <div>
+                  <h3 className="text-lg font-semibold">{item.name}</h3>
+                  <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                </div>
               </div>
-              <p className="text-sm text-gray-500 mb-3">
-                {entry.items.length} item{entry.items.length !== 1 ? 's' : ''}
-              </p>
-              <div className="flex gap-3 flex-wrap">
-                {entry.items.map((item, itemIdx) => (
-                  <div
-                    key={itemIdx}
-                    className="w-[80px] h-[100px] flex items-center justify-center border rounded bg-gray-50"
-                  >
-                    <img
-                      src={item.src}
-                      alt={item.name}
-                      width={40}
-                      height={40}
-                      className="object-contain"
-                    />
-                  </div>
-                ))}
+
+              <div className="flex items-center gap-2">
+                <Button onClick={() => handleDecrease(item.id)} variant="outline" className="text-md bg-gray-200">−</Button>
+                <span className="text-2xl">{item.quantity}</span>
+                <Button onClick={() => handleIncrease(item.id)} variant="outline" className="text-md bg-gray-200">+</Button>
+                <Button onClick={() => handleRemoveItem(item.id)} variant="outline" className="text-md bg-gray-200">
+                  ❌ Remove
+                </Button>
               </div>
             </div>
           ))}

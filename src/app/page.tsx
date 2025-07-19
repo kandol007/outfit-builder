@@ -1,11 +1,13 @@
 'use client';
 
-import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useCartStore } from '@/lib/store';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import Image from 'next/image'; // Import necessary components
+import { useEffect, useRef, useState } from 'react'; // Import necessary hooks and components
+import { useRouter } from 'next/navigation'; // Import necessary hooks and components
+import { useCartStore } from '@/lib/store'; // Import Zustand store
+import { Button } from '@/components/ui/button'; // Import Button component
+import { toast } from 'sonner'; // Import Sonner for notifications
+import { v4 as uuidv4 } from 'uuid'; // Import UUID for unique IDs
+import { Rnd } from 'react-rnd'; // Import Rnd for draggable and resizable components
 
 const clothingItems = [
   { src: '/clothing-icons/accessories/belt1.png', name: 'Belt-1' },
@@ -28,15 +30,25 @@ const clothingItems = [
   { src: '/clothing-icons/tops/top3.png', name: 'Top 3' },
   { src: '/clothing-icons/tops/top4.png', name: 'Top 4' },
   { src: '/clothing-icons/tops/top5.png', name: 'Top 5' },
-];
+];  // Define clothing items with their image sources and names
 
-export default function OutfitBuilder() {
-  const [canvasItems, setCanvasItems] = useState<typeof clothingItems>([]);
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const addToCart = useCartStore((s) => s.addItem);
-  const router = useRouter();
+type CanvasItem = {    // Define the type for items on the canvas
+  id: string;
+  src: string;
+  name: string;
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+};
 
-  useEffect(() => {
+export default function OutfitBuilder() {  // Main component for the outfit builder
+  const [canvasItems, setCanvasItems] = useState<typeof clothingItems>([]); 
+  const canvasRef = useRef<HTMLDivElement>(null);  
+  const addToCart = useCartStore((s) => s.addItem); 
+  const router = useRouter(); 
+
+  useEffect(() => {  // Load saved outfit from localStorage on component mount
     const saved = localStorage.getItem('savedOutfit');
     try {
       if (saved) setCanvasItems(JSON.parse(saved));
@@ -46,12 +58,12 @@ export default function OutfitBuilder() {
     }
   }, []);
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {  // Handle drop event on the canvas
     const src = e.dataTransfer.getData('src');
     const name = e.dataTransfer.getData('name');
     const lname = name.toLowerCase();
 
-    let category = '';
+    let category = '';            // Determine the category based on the item name
     if (lname.includes('cap') || lname.includes('hat')) category = 'headwear';
     else if (lname.includes('sunglass')) category = 'sunglass';
     else if (lname.includes('top')) category = 'top';
@@ -60,7 +72,7 @@ export default function OutfitBuilder() {
     else if (lname.includes('shoe')) category = 'shoe';
     else return;
 
-    const updatedItems = canvasItems.filter((item) => {
+    const updatedItems = canvasItems.filter((item) => {    // Filter out items that don't match the category
       const iname = item.name.toLowerCase();
       if (category === 'headwear') return !(iname.includes('cap') || iname.includes('hat'));
       return !iname.includes(category);
@@ -69,18 +81,24 @@ export default function OutfitBuilder() {
     setCanvasItems([...updatedItems, { src, name }]);
   };
 
-  const handleDragStart = (item: { src: string; name: string }, e: React.DragEvent) => {
+  const handleDragStart = (item: { src: string; name: string }, e: React.DragEvent) => {   // Handle drag start event for clothing items
     e.dataTransfer.setData('src', item.src);
     e.dataTransfer.setData('name', item.name);
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = () => {        // Handle adding items to the cart
     if (canvasItems.length === 0) {
-      toast.warning('Add some items to canvas before adding to cart.');
+      toast.warning('🛑 Add some items to canvas before adding to cart.');
       return;
     }
-    addToCart({ items: canvasItems });
-    toast.success('Outfit added to cart!');
+    canvasItems.forEach((item) => {
+    addToCart({
+      id: item.name, // 👈 generate a unique ID
+      name: item.name,
+      src: item.src,
+    });
+   });
+    toast.success('🛒 Outfit added to cart!');
   };
 
   const handleReset = () => {
@@ -90,7 +108,7 @@ export default function OutfitBuilder() {
 
   const handleSave = () => {
     localStorage.setItem('savedOutfit', JSON.stringify(canvasItems));
-    toast.success('Outfit saved to device!');
+    toast.success('💾 Outfit saved to Memory, Now you can load it later unless you reset it!! ');
   };
 
   const handleGoToCart = () => {
@@ -99,8 +117,9 @@ export default function OutfitBuilder() {
 
   return (
     <main className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Clothing List */}
       <section className="border p-4 rounded-xl shadow-xl">
-        <h2 className="font-bold mb-4">Clothing Items</h2>
+        <h2 className="text-2xl text-center font-bold mb-4">Clothing Items</h2>
         <div className="grid grid-cols-2 gap-2">
           {clothingItems.map((item, idx) => (
             <Image
@@ -117,12 +136,13 @@ export default function OutfitBuilder() {
         </div>
       </section>
 
+      {/* Canvas */}
       <section
         className="border p-4 rounded-xl shadow-xl col-span-2 min-h-[500px] relative"
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
       >
-        <h2 className="font-bold mb-4">Canvas</h2>
+        <h2 className="text-3xl text-center font-bold mb-4">Canvas</h2>
         <div
           ref={canvasRef}
           className="relative w-full h-[400px] bg-gray-50 border rounded-lg overflow-hidden"
@@ -139,24 +159,46 @@ export default function OutfitBuilder() {
             else if (name.includes('shoe')) top = 250;
 
             return (
-              <Image
+              <Rnd
                 key={idx}
+                default={{
+                  x: canvasRef.current?.clientWidth ? canvasRef.current.clientWidth / 2 - 20 : 100,
+                  y: top,
+                  width: 40,
+                  height: 40,
+                }}
+                bounds="parent"
+                enableResizing={{
+                  top: true,
+                  right: true,
+                  bottom: true,
+                  left: true,
+                  topRight: true,
+                  bottomRight: true,
+                  bottomLeft: true,
+                  topLeft: true,
+                }}
+                lockAspectRatio
+                className="absolute"
+              >
+              <Image
                 src={item.src}
                 alt={item.name}
-                width={40}
-                height={30}
-                className="absolute left-1/2 -translate-x-1/2"
-                style={{ top: `${top}px`, zIndex: idx + 1 }}
+                fill
+                className="object-contain"
+                draggable={false}
               />
-            );
-          })}
+            </Rnd>
+           );
+        })}
         </div>
 
+        {/* Action Buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mt-10">
-          <Button onClick={handleAddToCart}>Add to Cart</Button>
-          <Button onClick={handleSave}>Save Outfit</Button>
-          <Button onClick={handleGoToCart}>Go to Cart</Button>
-          <Button onClick={handleReset} variant="outline">Reset</Button>
+          <Button onClick={handleAddToCart} className="text-xl font-semibold">Add to Cart</Button>
+          <Button onClick={handleSave} className="text-xl font-semibold">Save Outfit</Button>
+          <Button onClick={handleGoToCart} className="text-xl font-semibold">Go to Cart</Button>
+          <Button onClick={handleReset} variant="outline" className="text-xl font-semibold">Reset</Button>
         </div>
       </section>
     </main>
