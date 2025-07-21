@@ -104,6 +104,9 @@ export default function OutfitBuilder() {  // Main component for the outfit buil
     router.push('/cart');
   };
 
+  const handleRemoveItem = (index: number) => {
+  setCanvasItems((prev) => prev.filter((_, i) => i !== index));
+};
   return (
     <main className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
       {/* Clothing List */}
@@ -147,38 +150,47 @@ export default function OutfitBuilder() {  // Main component for the outfit buil
             else if (name.includes('bottom')) top = 160;
             else if (name.includes('shoe')) top = 250;
 
-            return (
-              <Rnd
-                key={idx}
-                default={{
-                  x: canvasRef.current?.clientWidth ? canvasRef.current.clientWidth / 2 - 20 : 100,
-                  y: top,
-                  width: 40,
-                  height: 40,
-                }}
-                bounds="parent"
-                enableResizing={{
-                  top: true,
-                  right: true,
-                  bottom: true,
-                  left: true,
-                  topRight: true,
-                  bottomRight: true,
-                  bottomLeft: true,
-                  topLeft: true,
-                }}
-                lockAspectRatio
-                className="absolute"
-              >
-              <Image
-                src={item.src}
-                alt={item.name}
-                fill
-                className="object-contain"
-                draggable={false}
-              />
-            </Rnd>
-           );
+       return (
+         <Rnd
+          key={idx}
+          default={{
+            x: canvasRef.current?.clientWidth ? canvasRef.current.clientWidth / 2 - 20 : 100,
+            y: top,
+            width: 40,
+            height: 40,
+         }}
+          bounds="parent"
+          enableResizing={{
+            top: true,
+            right: true,
+            bottom: true,
+            left: true,
+            topRight: true,
+            bottomRight: true,
+            bottomLeft: true,
+            topLeft: true,
+          }}
+          lockAspectRatio
+          className="absolute"
+         >
+         <div className="w-full h-full relative">
+          <Image
+            src={item.src}
+            alt={item.name}
+            fill
+            className="object-contain"
+            draggable={false}
+           />
+           <button
+            onClick={() => handleRemoveItem(idx)}
+            className="absolute z-50 -top-2 -right-2 bg-gray-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center shadow-md hover:bg-red-900"
+            title="Remove item"
+            >
+              ×
+             </button>
+           </div>
+          </Rnd>
+         );
         })}
         </div>
 
